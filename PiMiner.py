@@ -6,7 +6,7 @@ from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 from PiMinerDisplay import PiMinerDisplay
 
 HOLD_TIME	= 3.0 #Time (seconds) to hold select button for shut down
-REFRESH_TIME= 3.0 #Time (seconds) between data updates
+REFRESH_TIME= 5.0 #Time (seconds) between data updates
 HALT_ON_EXIT= True
 display		= PiMinerDisplay()
 lcd			= display.lcd
@@ -17,7 +17,7 @@ lastTime	= time.time()
 def shutdown():
 	lcd.clear()
 	if HALT_ON_EXIT:
-		lcd.message('Wait 30 seconds\nto unplug...')
+		lcd.message('Wait 30 Seconds\nto Unplug...')
 		subprocess.call("sync")
 		subprocess.call(["shutdown", "-h", "now"])
 	else:
@@ -38,19 +38,20 @@ def internetOn():
 t = time.time()
 while True:
 	lcd.clear()
-	lcd.message('checking network\nconnection ...')
+	lcd.message('Checking Network\nConnection ...')
 	if (time.time() - t) > 120:
 		# No connection reached after 2 minutes
 		lcd.clear()
-		lcd.message('network is\nunavailable')
+		lcd.message('Network is\nUnavailable')
 		time.sleep(30)
 		exit(0)
 	try:
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		s.connect(('8.8.8.8', 0))
 		lcd.backlight(lcd.ON)
+		lcd.backlight(lcd.GREEN)
 		lcd.clear()
-		lcd.message('IP address:\n' + s.getsockname()[0])
+		lcd.message('IP Address:\n' + s.getsockname()[0])
 		time.sleep(5)
 		display.initInfo()	# Start info gathering/display
 		break         		# Success

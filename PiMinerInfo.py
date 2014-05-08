@@ -13,7 +13,7 @@ import time
 
 class PiMinerInfo:
 	
-	host 		= ''
+	host 		= '10.0.1.200'
 	port 		= 4028
 	errRate 	= 0.0
 	accepted 	= 0.0
@@ -26,9 +26,7 @@ class PiMinerInfo:
 	screen4 	= ['no data','no data']
 	screen5 	= ['no data','no data']
 	currency 	= 'USD' 				#USD GBP EUR JPY AUD CAD CHF CNY DKK HKD PLN RUB SEK SGD THB NOK CZK
-	mkt_data	= 'bitstamp'			#mtgox has big deviations from other exchanges so configuring for bitstamp
-										#which only supports USD so far. Change to '' if you want other currency or
-										#fallback to goxbux
+	mkt_data	= 'bitstamp'			#bitstamp only supports USD at this time
 	dollars 	= ['USD', 'AUD', 'CAD']	#currencies with displayable symbols
 	lastCheck 	= time.time()			#time of last price check
 	priceWait 	= 60.0					#interval between price checks
@@ -37,7 +35,7 @@ class PiMinerInfo:
 	priceHi 	= '-'					#high price
 
 	def __init__(self):
-	  self.host = self.get_ipaddress()
+	  self.host = '10.0.1.200' #self.get_ipaddress()
 	  self.refresh()
 	  self.checkPrice()
 	  
@@ -143,7 +141,7 @@ class PiMinerInfo:
 		rej = self.abbrev(d['Rejected'])
 		hw = self.abbrev(d['Hardware Errors'])
 		s1 = 'A%s R%s H%s' % (acc, rej, hw)
-		s2 = 'avg:%s' % self.hashrate(float(d['MHS av']))
+		s2 = '%s' % self.hashrate(float(d['MHS av']))
 		return [s1, s2]
 	  except Exception as e:
 		return [str(e), str(e)]
@@ -184,7 +182,7 @@ class PiMinerInfo:
 			if not r[0][0] == 'STATUS=S': return
 			if not r[1][0] == 'CONFIG': return
 			d = r[1][1]
-			return 'devcs: %s' % (int(d.get('GPU Count','0')) + int(d.get('PGA Count','0')) + int(d.get('ASC Count','0')))
+			return 'Devices: %s' % (int(d.get('GPU Count','0')) + int(d.get('PGA Count','0')) + int(d.get('ASC Count','0')))
 		except Exception as e:
 			return str(e)
 
@@ -192,16 +190,13 @@ class PiMinerInfo:
 		if not isinstance(r, (list, tuple)): return
 		try:
 			d = r[1][1]
-			return 'diff: %.2fm' % (float(d['Network Difficulty']) / 1000000.0)
+			return 'Difficulty: %.2fm' % (float(d['Network Difficulty']) / 1000000.0)
 		except Exception as e:
 			return str(e)
 
 	def checkPrice(self):
 		try:
-			url = 'https://data.mtgox.com/api/2/BTC***/money/ticker'.replace('***', self.currency)
-			if self.mkt_data == 'bitstamp':
-				url = 'https://www.bitstamp.net/api/ticker/'
-				
+			url = 'https://www.bitstamp.net/api/ticker/'
 			f = urllib.urlopen(url)
 		except Exception as e:
 			self.reportError(e)
@@ -218,33 +213,14 @@ class PiMinerInfo:
 			except ValueError:
 				return None
 				
-			if prices_json and self.mkt_data == 'bitstamp':
-				price_high = prices_json['high']
-				price_last = prices_json['last']
-				price_low = prices_json['low']
-			else:
-				if prices_json and prices_json['result'] == 'success':
-					data = prices_json['data']
-
+			price_high = prices_json['high']
+			price_last = prices_json['last']
+			price_low = prices_json['low']
 		#bitstamp currently only returns USD$
-		if self.mkt_data == 'bitstamp':
-			self.priceLast = '$' + price_last if price_last else '-'
-			self.priceLo = price_low if price_low else '-'
-			self.priceHi = price_high if price_high else '-'
+		self.priceLast = '$' + price_last if price_last else '-'
+		self.priceLo = price_low if price_low else '-'
+		self.priceHi = price_high if price_high else '-'
 
-		#assumes original mtgox configuration with USD
-		elif self.currency in self.dollars:
-			self.priceLast = data['last']['display_short'] if data else '-'
-			self.priceLo = data['low']['display_short'] if data else '-'
-			a, self.priceLo = self.priceLo.split('$')
-			self.priceHi = data['high']['display_short'] if data else '-'
-			a, self.priceHi = self.priceHi.split('$')
-		#non-compatible symbol currencies, assumes mtgox
-		else:
-			self.priceLast = ('%.2f ' % float(data['last']['value']) if data else '-') + self.currency
-			self.priceLo = '%.2f' % float(data['low']['value']) if data else '-'
-			self.priceHi = '%.2f' % float(data['high']['value']) if data else '-'
-	
 	def refresh(self):
 		
 		s = self.cg_rpc(self.host, self.port, 'summary')
@@ -258,8 +234,8 @@ class PiMinerInfo:
 		s = self.cg_rpc(self.host, self.port, 'coin')
 		self.screen4[1] = self.parse_coin(s)
 		
-		self.screen4[0] = 'time: %s' % self.uptime
-		self.screen2[1] = 'error: %.2f%%' % self.errRate
+		self.screen4[0] = 'Uptime: %s' % self.uptime
+		self.screen2[1] = 'Errors:  %.2f%%' % self.errRate
 		
 		now = time.time()
 		since = now - self.lastCheck
@@ -267,6 +243,6 @@ class PiMinerInfo:
 			self.checkPrice()
 			self.lastCheck = time.time()
 			
-		self.screen5[0] = 'last: %s' % self.priceLast
+		self.screen5[0] = 'Last: %s' % self.priceLast
 		self.screen5[1] = 'H:' + self.priceHi + ' L:' + self.priceLo
 		

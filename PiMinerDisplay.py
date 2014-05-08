@@ -57,7 +57,7 @@ class PiMinerDisplay:
 			self.lcd.message(s)
 		except TypeError:
 			self.lcd.clear()
-			self.lcd.message('connecting\nto cgminer ...')
+			self.lcd.message('Waiting\nfor Miner(s) ...')
         	
 
 	#Cycle Backlight Color / On/Off
@@ -98,4 +98,4 @@ class PiMinerDisplay:
                 elif self.mode == 1: self.dispLocalInfo()
                 elif self.mode == 2: self.dispRewardsInfo()
                 elif self.mode == 3: self.dispUptimeInfo()
-                elif self.mode == 4: self.dispValueInfo()
+               	elif self.mode == 4: self.dispValueInfo()
