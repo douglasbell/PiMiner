@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-#This file uses code from fcicq's cgmonitor.py released under GPLv3:
-#https://gist.github.com/fcicq/4975730
-#for details see LICENSE.txt
+# This file uses code from fcicq's cgmonitor.py released under GPLv3:
+# https://gist.github.com/fcicq/4975730
+# for details see LICENSE.txt
 
 import subprocess
 import socket
@@ -13,29 +13,29 @@ import time
 
 class PiMinerInfo:
 	
-	host 		= '10.0.1.200'
-	port 		= 4028
-	errRate 	= 0.0
-	accepted 	= 0.0
-	hw 			= 0.0
+	host 		 = '10.0.1.200'
+	port 		 = 4028
+	errRate 	 = 0.0
+	accepted 	 = 0.0
+	hw 			 = 0.0
 	diff1shares = 0.0
-	uptime 		= ''
-	screen1 	= ['no data','no data']
-	screen2 	= ['no data','no data']
-	screen3 	= ['no data','no data']
-	screen4 	= ['no data','no data']
-	screen5 	= ['no data','no data']
-	currency 	= 'USD' 				#USD GBP EUR JPY AUD CAD CHF CNY DKK HKD PLN RUB SEK SGD THB NOK CZK
-	mkt_data	= 'bitstamp'			#bitstamp only supports USD at this time
-	dollars 	= ['USD', 'AUD', 'CAD']	#currencies with displayable symbols
-	lastCheck 	= time.time()			#time of last price check
-	priceWait 	= 60.0					#interval between price checks
-	priceLast	= '-'					#last price via mtgox
-	priceLo 	= '-'					#low price
-	priceHi 	= '-'					#high price
+	uptime 		 = ''
+	screen1 	 = ['no data', 'no data']
+	screen2 	 = ['no data', 'no data']
+	screen3 	 = ['no data', 'no data']
+	screen4 	 = ['no data', 'no data']
+	screen5 	 = ['no data', 'no data']
+	currency 	 = 'USD'  # USD GBP EUR JPY AUD CAD CHF CNY DKK HKD PLN RUB SEK SGD THB NOK CZK
+	mkt_data	 = 'bitstamp'  # bitstamp only supports USD at this time
+	dollars 	 = ['USD', 'AUD', 'CAD']  # currencies with displayable symbols
+	lastCheck 	 = time.time()  # time of last price check
+	priceWait 	 = 60.0  # interval between price checks
+	priceLast	 = '-'  # last price
+	priceLo 	 = '-'  # low price
+	priceHi 	 = '-'  # high price
 
 	def __init__(self):
-	  self.host = '10.0.1.200' #self.get_ipaddress()
+	  self.host = '10.0.1.200'  # self.get_ipaddress()
 	  self.refresh()
 	  self.checkPrice()
 	  
@@ -61,10 +61,10 @@ class PiMinerInfo:
 	
 	def get_ipaddress(self):
 		arg = 'ip route list'
-		p = subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+		p = subprocess.Popen(arg, shell=True, stdout=subprocess.PIPE)
 		data = p.communicate()
 		split_data = data[0].split()
-		self.ipaddr = split_data[split_data.index('src')+1]
+		self.ipaddr = split_data[split_data.index('src') + 1]
 		s = '%s' % self.ipaddr
 		self.reportError(s)
 		return self.ipaddr
@@ -76,7 +76,7 @@ class PiMinerInfo:
 		if t >= 86400:
 			d = t // 86400
 			t = t % 86400
-		r.append('%02d:%02d:%02d' % (d, t // 3600, (t % 3600) // 60))	#seconds == t % 60
+		r.append('%02d:%02d:%02d' % (d, t // 3600, (t % 3600) // 60))  # seconds == t % 60
 		return ' '.join(r)
 	
 	def cg_rpc(self, host, port, command):
@@ -118,7 +118,7 @@ class PiMinerInfo:
 			vs = '%.1f' % va
 			vs = vs.replace('.', 'm')
 			return vs
-		#billion
+		# billion
 		else:
 			return '%d' % v
 	  
@@ -133,7 +133,7 @@ class PiMinerInfo:
 		self.accepted = float(d['Accepted'])
 		self.hw = float(d['Hardware Errors'])
 		try:
-			#self.errRate = self.hw / self.accepted * 100.0
+			# self.errRate = self.hw / self.accepted * 100.0
 			self.errRate = 100.0 * self.hw / (self.diff1shares + self.hw)
 		except Exception as e:
 			self.errRate = 0.0
@@ -147,7 +147,7 @@ class PiMinerInfo:
 		return [str(e), str(e)]
 
 	def conv_prio_dict(self, p):
-		if isinstance(p, (tuple, list, )):
+		if isinstance(p, (tuple, list,)):
 			try:
 				pd = dict(p)
 			except TypeError:
@@ -182,7 +182,7 @@ class PiMinerInfo:
 			if not r[0][0] == 'STATUS=S': return
 			if not r[1][0] == 'CONFIG': return
 			d = r[1][1]
-			return 'Devices: %s' % (int(d.get('GPU Count','0')) + int(d.get('PGA Count','0')) + int(d.get('ASC Count','0')))
+			return 'Devices: %s' % (int(d.get('GPU Count', '0')) + int(d.get('PGA Count', '0')) + int(d.get('ASC Count', '0')))
 		except Exception as e:
 			return str(e)
 
@@ -216,7 +216,7 @@ class PiMinerInfo:
 			price_high = prices_json['high']
 			price_last = prices_json['last']
 			price_low = prices_json['low']
-		#bitstamp currently only returns USD$
+		# bitstamp currently only returns USD$
 		self.priceLast = '$' + price_last if price_last else '-'
 		self.priceLo = price_low if price_low else '-'
 		self.priceHi = price_high if price_high else '-'

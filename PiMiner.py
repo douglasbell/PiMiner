@@ -5,14 +5,14 @@ sys.path.append("/home/pi/Adafruit-Raspberry-Pi-Python-Code/Adafruit_CharLCDPlat
 from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 from PiMinerDisplay import PiMinerDisplay
 
-HOLD_TIME	= 3.0 #Time (seconds) to hold select button for shut down
-REFRESH_TIME= 5.0 #Time (seconds) between data updates
-HALT_ON_EXIT= True
-display		= PiMinerDisplay()
-lcd			= display.lcd
-prevCol		= -1
-prev		= -1
-lastTime	= time.time()
+HOLD_TIME	 = 3.0  # Time (seconds) to hold select button for shut down
+REFRESH_TIME = 5.0  # Time (seconds) between data updates
+HALT_ON_EXIT = True
+display		 = PiMinerDisplay()
+lcd			 = display.lcd
+prevCol		 = -1
+prev		 = -1
+lastTime	 = time.time()
 
 def shutdown():
 	lcd.clear()
@@ -34,7 +34,7 @@ def internetOn():
 	return False
 '''
 
-#Check for network connection at startup
+# Check for network connection at startup
 t = time.time()
 while True:
 	lcd.clear()
@@ -53,10 +53,10 @@ while True:
 		lcd.clear()
 		lcd.message('IP Address:\n' + s.getsockname()[0])
 		time.sleep(5)
-		display.initInfo()	# Start info gathering/display
-		break         		# Success
+		display.initInfo()  # Start info gathering/display
+		break  # Success
 	except:
-		time.sleep(1) 		# Pause a moment, keep trying
+		time.sleep(1)  # Pause a moment, keep trying
 '''
 	if internetOn() == True:
 		time.sleep(5)
@@ -70,10 +70,10 @@ while True:
 	b = lcd.buttons()
 	if b is not prev:
 		if lcd.buttonPressed(lcd.SELECT):
-			tt = time.time()                        # Start time of button press
-			while lcd.buttonPressed(lcd.SELECT):	# Wait for button release
-				if (time.time() - tt) >= HOLD_TIME: # Extended hold?
-					shutdown()						# We're outta here
+			tt = time.time()  # Start time of button press
+			while lcd.buttonPressed(lcd.SELECT):  # Wait for button release
+				if (time.time() - tt) >= HOLD_TIME:  # Extended hold?
+					shutdown()  # We're outta here
 			display.backlightStep()
 		elif lcd.buttonPressed(lcd.LEFT):
 	  		display.scrollRight()
