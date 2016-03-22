@@ -16,6 +16,10 @@ To download, log into your Pi with Internet accessibility and type: git clone ht
 
 Changes
 -------------
+Version 1.1.2 (forked by douglasbell)
+- Removed support for defunt Mt. Gox
+- Improved start up and validation messages
+- Improvided messaging on 16x2 LCD to contain messages to a single line
 
 Version 1.1.1 (forked by denmojo)
 - Added support for bitstamp exchange rates (less price deviation than mtgox) in screen selection 3.
